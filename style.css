@@ -26,11 +26,14 @@ body, html {
 video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover; /* Ensure it fits screen without black bars */
     position: absolute;
     top: 0;
     left: 0;
     background: black;
+    
+    /* Apply both filters */
+    filter: invert(100%) grayscale(100%);
 }
 
 .controls {
