@@ -30,7 +30,7 @@
         video {
             width: 100vw;
             height: 100vh;
-            object-fit: cover; /* Ensure video fills the screen */
+            object-fit: cover; /* Ensure video covers the entire screen */
             position: absolute;
             top: 0;
             left: 0;
@@ -39,7 +39,7 @@
 
         .controls {
             position: absolute;
-            bottom: 20px; /* Position fullscreen button above iPhone bar */
+            bottom: 60px; /* Lift button up so it's above iPhone's home bar */
             width: 100%;
             display: flex;
             justify-content: center;
@@ -47,12 +47,13 @@
         }
 
         button {
-            padding: 12px 25px;
+            padding: 14px 28px;
             background-color: #fff;
             border: none;
             cursor: pointer;
             font-size: 18px;
             z-index: 10;
+            border-radius: 8px; /* Make the button more visible */
         }
 
         button:hover {
@@ -79,7 +80,7 @@
     <div class="container">
         <video id="cameraStream" autoplay playsinline></video>
         <div class="controls">
-            <button id="fullscreenBtn">Enter Fullscreen</button> <!-- Fullscreen button -->
+            <button id="fullscreenBtn">Go Fullscreen</button> <!-- Button visible and clickable -->
         </div>
     </div>
 
@@ -106,15 +107,13 @@
 
         // Fullscreen functionality for iOS Safari
         fullscreenBtn.addEventListener('click', () => {
-            if (!document.fullscreenElement && video.webkitEnterFullscreen) {
-                video.webkitEnterFullscreen(); // Safari iOS specific fullscreen for video elements
-                fullscreenBtn.innerText = "Exit Fullscreen";
-            } else if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen(); // Standard browsers' fullscreen
-                fullscreenBtn.innerText = "Exit Fullscreen";
+            // Special handling for iOS Safari fullscreen video
+            if (video.webkitEnterFullscreen) {
+                video.webkitEnterFullscreen(); // Trigger fullscreen for video on iOS
+            } else if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen(); // Use fullscreen for non-iOS
             } else {
-                document.exitFullscreen(); // Exit fullscreen
-                fullscreenBtn.innerText = "Enter Fullscreen";
+                console.log("Fullscreen is not supported.");
             }
         });
 
