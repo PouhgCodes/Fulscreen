@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Camera Preview without Microphone</title>
+    <title>Camera with Inverted Audio</title>
     <style>
         * {
             margin: 0;
@@ -90,9 +90,20 @@
                         width: { ideal: 3840 },
                         height: { ideal: 2160 },
                         frameRate: { ideal: 60 }
-                    }
+                    },
+                    audio: true // Capture microphone input
                 });
+
                 video.srcObject = stream;
+
+                // Setup audio context for noise cancellation attempt
+                const audioContext = new AudioContext();
+                const source = audioContext.createMediaStreamSource(stream);
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = -1; // Invert audio phase
+
+                source.connect(gainNode);
+                gainNode.connect(audioContext.destination);
             } catch (err) {
                 console.error("Error accessing the camera: ", err);
                 showError();
@@ -109,33 +120,4 @@
 
         function adjustTextPosition() {
             const viewportHeight = window.innerHeight;
-            const fullHeight = window.innerHeight || document.documentElement.clientHeight;
-            const diff = fullHeight - viewportHeight;
-            
-            if (diff > 0) {
-                scrollInstruction.style.bottom = diff + 20 + 'px';
-            } else {
-                scrollInstruction.style.bottom = '20px';
-            }
-        }
-
-        adjustTextPosition();
-        window.addEventListener('resize', adjustTextPosition);
-
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 0) {
-                scrollInstruction.style.bottom = '10px';
-            } else {
-                adjustTextPosition();
-            }
-        });
-
-        function adjustVideoFit() {
-            video.style.width = '100vw';
-            video.style.height = '100vh';
-        }
-
-        window.addEventListener('resize', adjustVideoFit);
-    </script>
-</body>
-</html>
+            const fullHeight = window.innerHeight || document.document
