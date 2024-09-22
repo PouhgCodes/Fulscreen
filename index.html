@@ -30,11 +30,11 @@
         video {
             width: 100vw;
             height: 100vh;
-            object-fit: cover; /* Ensure the video stream covers the screen */
+            object-fit: cover; /* Ensures the video covers the screen without black bars */
             position: absolute;
             top: 0;
             left: 0;
-            filter: invert(100%) grayscale(100%); /* Apply filters */
+            filter: invert(100%) grayscale(100%); /* Apply filters to both modes */
         }
 
         .controls {
@@ -76,7 +76,7 @@
         const video = document.getElementById('cameraStream');
         const fullscreenBtn = document.getElementById('fullscreenBtn');
 
-        // Start the back-facing camera
+        // Start the back-facing camera with filters applied
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -90,29 +90,29 @@
             }
         }
 
-        // Start camera when the page loads
+        // Start camera on page load
         startCamera();
 
-        // Fullscreen functionality
+        // Fullscreen functionality with UI hiding
         fullscreenBtn.addEventListener('click', () => {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen(); // Enter fullscreen mode
+                document.documentElement.requestFullscreen(); // Enter fullscreen
             } else {
-                document.exitFullscreen(); // Exit fullscreen mode
+                document.exitFullscreen(); // Exit fullscreen
             }
         });
 
-        // Ensure the camera stream covers the screen in portrait mode
+        // Adjust video fit to ensure it fills the screen properly without black bars
         function adjustVideoFit() {
             video.style.width = '100vw';
             video.style.height = '100vh';
-            video.style.objectFit = 'cover'; // Ensure the video covers the screen in portrait mode
+            video.style.objectFit = 'cover'; // Ensures the video covers the entire screen
         }
 
-        // Call this function on page load to adjust the video
+        // Initial call to ensure the video is scaled correctly
         adjustVideoFit();
 
-        // Listen for window resize to adjust the video size dynamically
+        // Re-adjust video size when the window is resized or orientation changes
         window.addEventListener('resize', adjustVideoFit);
     </script>
 </body>
