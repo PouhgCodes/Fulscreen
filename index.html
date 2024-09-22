@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Camera Preview with Maximum Resolution</title>
+    <title>Camera Preview with Max Quality Enhancements</title>
     <style>
         * {
             margin: 0;
@@ -90,7 +90,7 @@
         const scrollInstruction = document.getElementById('scrollInstruction');
         const errorMessage = document.getElementById('errorMessage');
 
-        // Start the back-facing camera with maximum resolution and filters, with error handling
+        // Start the back-facing camera with max resolution, frame rate, and experimental noise reduction
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -98,6 +98,8 @@
                         facingMode: { exact: "environment" }, // Use back camera
                         width: { ideal: 3840 },  // 4K resolution width (ideal)
                         height: { ideal: 2160 }, // 4K resolution height (ideal)
+                        frameRate: { ideal: 60 }, // Aim for 60 fps for smoother video
+                        advanced: [{ noiseSuppression: false }] // Disable noise suppression (experimental)
                     }
                 });
                 video.srcObject = stream;
