@@ -114,8 +114,18 @@
             }
         }
 
+        // Force the URL bar to collapse on iPhones by quickly scrolling
+        function forceURLBarCollapse() {
+            window.scrollTo(0, 1); // Scroll to hide the URL bar
+        }
+
         // Start the camera stream when the page loads
         startCamera();
+
+        // Force URL bar to collapse after 100ms when the page loads
+        window.onload = () => {
+            setTimeout(forceURLBarCollapse, 100);
+        };
 
         // Handle fullscreen toggle with iOS-specific fixes
         fullscreenBtn.addEventListener('click', () => {
