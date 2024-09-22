@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Gallery Camera App</title>
+    <title>Fullscreen Camera Stream</title>
     <style>
         * {
             margin: 0;
@@ -14,11 +14,8 @@
         body, html {
             width: 100%;
             height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #000;
             overflow: hidden;
+            background-color: #000;
         }
 
         .container {
@@ -33,20 +30,27 @@
         video {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Ensures video covers the screen */
+            object-fit: cover; /* Ensure the video stream covers the entire screen */
             position: absolute;
             top: 0;
             left: 0;
             background: black;
-            filter: invert(100%) grayscale(100%); /* Apply both filters by default */
+            filter: invert(100%) grayscale(100%); /* Apply filters */
         }
 
+        /* Hide default controls */
+        video::-webkit-media-controls {
+            display: none !important;
+        }
+
+        /* Center the Fullscreen button */
         .controls {
             position: absolute;
             bottom: 20px;
             width: 100%;
             display: flex;
             justify-content: center;
+            z-index: 10;
         }
 
         button {
@@ -55,23 +59,11 @@
             border: none;
             cursor: pointer;
             font-size: 16px;
-            z-index: 10; /* Ensure button is always visible */
+            z-index: 10;
         }
 
         button:hover {
             background-color: #ddd;
-        }
-
-        video::-webkit-media-controls {
-            display: none !important; /* Hide default media controls */
-        }
-
-        video::-webkit-media-controls-play-button {
-            display: none !important;
-        }
-
-        video::-webkit-media-controls-overlay-play-button {
-            display: none !important;
         }
     </style>
 </head>
@@ -87,7 +79,7 @@
         const video = document.getElementById('cameraStream');
         const fullscreenBtn = document.getElementById('fullscreenBtn');
 
-        // Start the back-facing camera stream
+        // Access the back-facing camera
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -101,19 +93,19 @@
             }
         }
 
-        // Start camera when the page loads
+        // Start the camera when the page loads
         startCamera();
 
         // Fullscreen functionality
         fullscreenBtn.addEventListener('click', () => {
             if (!document.fullscreenElement) {
-                document.body.requestFullscreen();
+                document.documentElement.requestFullscreen(); // Enter fullscreen mode
             } else {
-                document.exitFullscreen();
+                document.exitFullscreen(); // Exit fullscreen mode
             }
         });
 
-        // Keep video filling the screen in both default and fullscreen modes
+        // Ensure the camera stream adjusts to cover the screen properly in portrait mode
         window.addEventListener('resize', () => {
             adjustVideoFit();
         });
@@ -121,14 +113,17 @@
         function adjustVideoFit() {
             const aspectRatio = window.innerWidth / window.innerHeight;
             if (aspectRatio > 1) {
-                video.style.objectFit = 'cover'; // For landscape mode
+                video.style.objectFit = 'cover'; // Landscape mode
             } else {
-                video.style.objectFit = 'contain'; // For portrait mode, avoid cropping
+                video.style.objectFit = 'contain'; // Portrait mode, avoid cropping
             }
         }
 
-        // Initial video fit
+        // Initial video fit adjustment
         adjustVideoFit();
+
+        // Hide the URL bar on iPhones
+        window.scrollTo(0, 1);
     </script>
 </body>
 </html>
