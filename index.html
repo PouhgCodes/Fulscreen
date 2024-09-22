@@ -30,16 +30,16 @@
         video {
             width: 100vw;
             height: 100vh;
-            object-fit: cover; /* Ensures video covers the entire screen */
+            object-fit: cover; /* Ensure video fills the screen */
             position: absolute;
             top: 0;
             left: 0;
-            filter: invert(100%) grayscale(100%); /* Apply filters to both modes */
+            filter: invert(100%) grayscale(100%); /* Apply filters */
         }
 
         .controls {
             position: absolute;
-            bottom: 30px; /* Ensure it's above the bottom bar on iPhones */
+            bottom: 20px; /* Position fullscreen button above iPhone bar */
             width: 100%;
             display: flex;
             justify-content: center;
@@ -60,15 +60,26 @@
         }
 
         video::-webkit-media-controls {
-            display: none !important; /* Hide default media controls */
+            display: none !important; /* Hide iOS media controls */
         }
+
+        video::-webkit-media-controls-play-button,
+        video::-webkit-media-controls-overlay-play-button {
+            display: none !important; /* Hide default iOS play buttons */
+        }
+
+        /* Hiding any controls iOS tries to show */
+        video::-webkit-media-controls-enclosure {
+            display: none !important;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <video id="cameraStream" autoplay playsinline></video>
         <div class="controls">
-            <button id="fullscreenBtn">Enter Fullscreen</button> <!-- Button visible and clickable -->
+            <button id="fullscreenBtn">Enter Fullscreen</button> <!-- Fullscreen button -->
         </div>
     </div>
 
@@ -93,22 +104,25 @@
         // Start camera on page load
         startCamera();
 
-        // Fullscreen functionality
+        // Fullscreen functionality for iOS Safari
         fullscreenBtn.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen(); // Enter fullscreen mode
-                fullscreenBtn.innerText = "Exit Fullscreen"; // Change button text when in fullscreen
+            if (!document.fullscreenElement && video.webkitEnterFullscreen) {
+                video.webkitEnterFullscreen(); // Safari iOS specific fullscreen for video elements
+                fullscreenBtn.innerText = "Exit Fullscreen";
+            } else if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen(); // Standard browsers' fullscreen
+                fullscreenBtn.innerText = "Exit Fullscreen";
             } else {
-                document.exitFullscreen(); // Exit fullscreen mode
-                fullscreenBtn.innerText = "Enter Fullscreen"; // Change button text back
+                document.exitFullscreen(); // Exit fullscreen
+                fullscreenBtn.innerText = "Enter Fullscreen";
             }
         });
 
-        // Ensure the camera stream covers the screen in both modes
+        // Adjust video to fill the screen without black bars on iPhone
         function adjustVideoFit() {
             video.style.width = '100vw';
             video.style.height = '100vh';
-            video.style.objectFit = 'cover'; // Ensure the video covers the entire screen
+            video.style.objectFit = 'cover'; // Ensures the video covers the entire screen
         }
 
         // Initial call to ensure the video is scaled correctly
