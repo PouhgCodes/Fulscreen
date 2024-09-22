@@ -60,7 +60,6 @@
             background-color: #ddd;
         }
 
-        /* iOS-specific fullscreen styles */
         #video-container:-webkit-full-screen {
             width: 100vw;
             height: 100vh;
@@ -108,13 +107,15 @@
         // Start the camera stream when the page loads
         startCamera();
 
-        // Fullscreen toggle for the container
-        fullscreenBtn.addEventListener('click', () => {
+        // Add a debug message to track if the button gets clicked
+        fullscreenBtn.addEventListener('touchstart', () => {
+            console.log('Fullscreen button clicked'); // This will confirm if the button is responding
+
             if (!document.fullscreenElement) {
-                container.webkitRequestFullscreen(); // Enter fullscreen for the container
+                container.webkitRequestFullscreen(); // Trigger fullscreen for the container
                 fullscreenBtn.innerText = "Exit Fullscreen";
             } else {
-                document.webkitExitFullscreen(); // Exit fullscreen
+                document.webkitExitFullscreen(); // Exit fullscreen mode
                 fullscreenBtn.innerText = "Enter Fullscreen";
             }
         });
@@ -123,10 +124,10 @@
         function adjustVideoFit() {
             video.style.width = '100vw';
             video.style.height = '100vh';
-            video.style.objectFit = 'cover'; // Ensures the video covers the entire screen
+            video.style.objectFit = 'cover';
         }
 
-        // Adjust the video fit initially
+        // Initial call to ensure the video is scaled correctly
         adjustVideoFit();
 
         // Re-adjust video size when the window is resized or orientation changes
