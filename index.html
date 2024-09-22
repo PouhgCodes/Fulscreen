@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Camera Preview with Scroll and Error Handling</title>
+    <title>Camera Preview with Custom Error Message</title>
     <style>
         * {
             margin: 0;
@@ -17,7 +17,7 @@
             width: 100%;
             height: 200vh; /* Large enough for scrolling */
             overflow-x: hidden;
-            background-color: #000;
+            background: linear-gradient(#D5D8DC, #1C2833); /* Gradient background */
         }
 
         /* Transparent canvas for scrolling */
@@ -60,9 +60,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #ff3333;
-            font-family: 'Arial', sans-serif;
-            font-size: 1.5em;
+            color: #ffffff; /* White text for contrast */
+            font-family: 'Times New Roman', serif;
+            font-size: calc(1em + 10%); /* User's default font size + 10% */
             text-align: center;
             display: none; /* Hidden by default */
         }
@@ -82,7 +82,7 @@
 
     <!-- Fallback error message for blocked camera -->
     <div id="errorMessage" class="error-message">
-        ⚠️ Camera access is blocked.<br>Please enable camera permissions in your browser settings or use a different browser.
+        camera access is blocked.<br>please enable camera permissions in your browser settings or use a different browser.
     </div>
 
     <script>
