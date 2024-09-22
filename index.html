@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Fullscreen Camera Stream</title>
+    <title>Fake Fullscreen Camera Stream</title>
     <style>
         * {
             margin: 0;
@@ -93,15 +93,12 @@
         const container = document.getElementById('video-container');
         let isFullscreen = false;
 
-        // Detect if the device is an iPhone or iPad
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
         // Start the back-facing camera with filters applied
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: { exact: "environment" }
+                        facingMode: { exact: "environment" } // Back camera
                     }
                 });
                 video.srcObject = stream;
@@ -113,40 +110,32 @@
         // Start the camera stream when the page loads
         startCamera();
 
-        // Force the URL bar to collapse by simulating a scroll on iOS
+        // Force the browser to hide the URL bar by simulating a scroll
         function collapseURLBar() {
-            window.scrollTo(0, 1); // Small scroll to hide the URL bar
+            window.scrollTo(0, 1); // Scroll by 1px to collapse the URL bar
         }
 
-        // Call collapseURLBar after 100ms to ensure it triggers after the page loads
-        window.onload = function() {
-            setTimeout(collapseURLBar, 100);
-        };
+        // Enter "fullscreen" by hiding browser UI
+        function enterFakeFullscreen() {
+            collapseURLBar(); // Collapse the URL bar
+            container.classList.add('fullscreen-like'); // Simulate fullscreen using CSS
+            fullscreenBtn.innerText = "Exit Fullscreen";
+        }
 
-        // Fullscreen-like toggle for iOS devices
+        // Exit "fullscreen" by showing browser UI again
+        function exitFakeFullscreen() {
+            container.classList.remove('fullscreen-like'); // Exit the CSS fullscreen mode
+            fullscreenBtn.innerText = "Enter Fullscreen";
+        }
+
+        // Toggle "fullscreen" mode
         fullscreenBtn.addEventListener('click', () => {
-            if (isIOS) {
-                collapseURLBar(); // Try to collapse the URL bar again on button click
-                if (!isFullscreen) {
-                    // Simulate fullscreen-like mode using CSS
-                    container.classList.add('fullscreen-like');
-                    fullscreenBtn.innerText = "Exit Fullscreen";
-                    isFullscreen = true;
-                } else {
-                    // Exit pseudo fullscreen mode
-                    container.classList.remove('fullscreen-like');
-                    fullscreenBtn.innerText = "Enter Fullscreen";
-                    isFullscreen = false;
-                }
+            if (!isFullscreen) {
+                enterFakeFullscreen();
+                isFullscreen = true;
             } else {
-                // For non-iOS devices, use native fullscreen API
-                if (!document.fullscreenElement) {
-                    container.requestFullscreen();
-                    fullscreenBtn.innerText = "Exit Fullscreen";
-                } else {
-                    document.exitFullscreen();
-                    fullscreenBtn.innerText = "Enter Fullscreen";
-                }
+                exitFakeFullscreen();
+                isFullscreen = false;
             }
         });
 
