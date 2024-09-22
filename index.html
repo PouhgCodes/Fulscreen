@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Camera Preview with Max Quality Enhancements</title>
+    <title>Camera Preview without Microphone</title>
     <style>
         * {
             margin: 0;
@@ -15,21 +15,19 @@
 
         body, html {
             width: 100%;
-            height: 200vh; /* Large enough for scrolling */
+            height: 200vh;
             overflow-x: hidden;
-            background: linear-gradient(#D5D8DC, #1C2833); /* Gradient background */
+            background: linear-gradient(#D5D8DC, #1C2833);
         }
 
-        /* Transparent canvas for scrolling */
         .scrollable-canvas {
             width: 100vw;
-            height: 200vh; /* Large enough for scrolling */
-            background-color: transparent; /* Make the canvas invisible */
+            height: 200vh;
+            background-color: transparent;
             position: relative;
             z-index: 1;
         }
 
-        /* Video feed stays fixed and full-screen */
         .video-feed {
             position: fixed;
             top: 0;
@@ -37,50 +35,44 @@
             width: 100vw;
             height: 100vh;
             object-fit: cover;
-            z-index: 10; /* Higher than canvas */
+            z-index: 10;
             filter: invert(100%) grayscale(100%);
         }
 
-        /* Text instruction for scrolling */
         .scroll-instruction {
             position: fixed;
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Times New Roman', serif;
-            font-size: 1em; /* Responsive to user's default font size */
-            color: #000000; /* Pure black */
+            font-size: 1em;
+            color: #000000;
             background: none;
             z-index: 20;
-            transition: bottom 0.3s ease; /* Smooth movement of the text */
+            transition: bottom 0.3s ease;
         }
 
-        /* Fallback message if camera access fails */
         .error-message {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #ffffff; /* White text for contrast */
+            color: #ffffff;
             font-family: 'Times New Roman', serif;
-            font-size: calc(1em + 10%); /* User's default font size + 10% */
+            font-size: calc(1em + 10%);
             text-align: center;
-            display: none; /* Hidden by default */
+            display: none;
         }
     </style>
 </head>
 <body>
-    <!-- Transparent canvas for scrolling -->
     <div class="scrollable-canvas"></div>
 
-    <!-- Fixed video feed -->
     <video id="cameraStream" class="video-feed" autoplay playsinline></video>
 
-    <!-- Scroll instruction -->
     <div id="scrollInstruction" class="scroll-instruction">
         Scroll to enter/exit fullscreen
     </div>
 
-    <!-- Fallback error message for blocked camera -->
     <div id="errorMessage" class="error-message">
         camera access is blocked.<br>please enable camera permissions in your browser settings or use a different browser.
     </div>
@@ -90,70 +82,59 @@
         const scrollInstruction = document.getElementById('scrollInstruction');
         const errorMessage = document.getElementById('errorMessage');
 
-        // Start the back-facing camera with max resolution, frame rate, and experimental noise reduction
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: { exact: "environment" }, // Use back camera
-                        width: { ideal: 3840 },  // 4K resolution width (ideal)
-                        height: { ideal: 2160 }, // 4K resolution height (ideal)
-                        frameRate: { ideal: 60 }, // Aim for 60 fps for smoother video
-                        advanced: [{ noiseSuppression: false }] // Disable noise suppression (experimental)
+                        facingMode: { exact: "environment" },
+                        width: { ideal: 3840 },
+                        height: { ideal: 2160 },
+                        frameRate: { ideal: 60 }
                     }
                 });
                 video.srcObject = stream;
             } catch (err) {
                 console.error("Error accessing the camera: ", err);
-                // Show error message if camera is blocked or denied
                 showError();
             }
         }
 
-        // Show fallback message if camera access is blocked
         function showError() {
             errorMessage.style.display = 'block';
-            video.style.display = 'none'; // Hide the video feed
-            scrollInstruction.style.display = 'none'; // Hide scroll instruction when camera is blocked
+            video.style.display = 'none';
+            scrollInstruction.style.display = 'none';
         }
 
-        // Start the camera feed when the page loads
         startCamera();
 
-        // Function to dynamically adjust the position of the text instruction
         function adjustTextPosition() {
-            const viewportHeight = window.innerHeight; // Height of the visible viewport
+            const viewportHeight = window.innerHeight;
             const fullHeight = window.innerHeight || document.documentElement.clientHeight;
-            const diff = fullHeight - viewportHeight; // Difference due to the URL bar
+            const diff = fullHeight - viewportHeight;
             
-            // Adjust the text to be above the browser UI (URL bar) if it's visible
             if (diff > 0) {
-                scrollInstruction.style.bottom = diff + 20 + 'px'; // Place above the URL bar
+                scrollInstruction.style.bottom = diff + 20 + 'px';
             } else {
-                scrollInstruction.style.bottom = '20px'; // Bottom of the screen
+                scrollInstruction.style.bottom = '20px';
             }
         }
 
-        // Call the function to adjust the text position on load and resize
         adjustTextPosition();
         window.addEventListener('resize', adjustTextPosition);
 
-        // Move the text to the very bottom of the screen on scroll
         window.addEventListener('scroll', () => {
             if (window.scrollY > 0) {
-                scrollInstruction.style.bottom = '10px'; // Stick to the bottom when scrolled
+                scrollInstruction.style.bottom = '10px';
             } else {
-                adjustTextPosition(); // Reset to its calculated position when at the top
+                adjustTextPosition();
             }
         });
 
-        // Adjust video to ensure it fits full screen
         function adjustVideoFit() {
             video.style.width = '100vw';
             video.style.height = '100vh';
         }
 
-        // Re-adjust video size on window resize or orientation change
         window.addEventListener('resize', adjustVideoFit);
     </script>
 </body>
