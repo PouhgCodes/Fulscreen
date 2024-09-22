@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Fake Fullscreen Camera Stream</title>
@@ -15,7 +15,7 @@
 
         body, html {
             width: 100%;
-            height: 100%;
+            height: 200vh; /* Ensures there's enough height to trigger scroll */
             overflow: hidden;
             background-color: #000;
         }
@@ -98,7 +98,7 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: { exact: "environment" } // Back camera
+                        facingMode: { exact: "environment" }
                     }
                 });
                 video.srcObject = stream;
@@ -114,6 +114,11 @@
         function collapseURLBar() {
             window.scrollTo(0, 1); // Scroll by 1px to collapse the URL bar
         }
+
+        // Trigger URL bar hiding on load
+        window.onload = function() {
+            setTimeout(collapseURLBar, 100); // Wait briefly before trying to scroll
+        };
 
         // Enter "fullscreen" by hiding browser UI
         function enterFakeFullscreen() {
