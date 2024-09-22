@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Camera Preview with Custom Error Message</title>
+    <title>Camera Preview with Improved Sharpness</title>
     <style>
         * {
             margin: 0;
@@ -90,12 +90,14 @@
         const scrollInstruction = document.getElementById('scrollInstruction');
         const errorMessage = document.getElementById('errorMessage');
 
-        // Start the back-facing camera with filters and error handling
+        // Start the back-facing camera with higher resolution and filters, with error handling
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: { exact: "environment" } // Use back camera
+                        facingMode: { exact: "environment" }, // Use back camera
+                        width: { ideal: 1920 }, // Request higher resolution (Full HD)
+                        height: { ideal: 1080 },
                     }
                 });
                 video.srcObject = stream;
