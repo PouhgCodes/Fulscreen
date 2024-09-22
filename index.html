@@ -62,7 +62,7 @@
             background-color: #ddd;
         }
 
-        /* Pseudo full-screen styles */
+        /* Pseudo fullscreen */
         .fullscreen-like {
             position: fixed;
             top: 0;
@@ -91,7 +91,7 @@
         const video = document.getElementById('cameraStream');
         const fullscreenBtn = document.getElementById('fullscreenBtn');
         const container = document.getElementById('video-container');
-        let isFullscreen = false; // Track fullscreen state
+        let isFullscreen = false;
 
         // Detect if the device is an iPhone or iPad
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -113,9 +113,20 @@
         // Start the camera stream when the page loads
         startCamera();
 
-        // Fullscreen-like toggle for iOS devices (if fullscreen doesn't work natively)
+        // Force the URL bar to collapse by simulating a scroll on iOS
+        function collapseURLBar() {
+            window.scrollTo(0, 1); // Small scroll to hide the URL bar
+        }
+
+        // Call collapseURLBar after 100ms to ensure it triggers after the page loads
+        window.onload = function() {
+            setTimeout(collapseURLBar, 100);
+        };
+
+        // Fullscreen-like toggle for iOS devices
         fullscreenBtn.addEventListener('click', () => {
             if (isIOS) {
+                collapseURLBar(); // Try to collapse the URL bar again on button click
                 if (!isFullscreen) {
                     // Simulate fullscreen-like mode using CSS
                     container.classList.add('fullscreen-like');
