@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Camera Stream with Dynamic Viewport Height</title>
+    <title>Camera Preview with Privacy Handling</title>
     <style>
         * {
             margin: 0;
@@ -15,44 +15,51 @@
 
         body, html {
             width: 100%;
-            height: 100%;
+            height: 100vh;
             overflow: hidden;
             background-color: #000;
         }
 
-        /* Fallback to 100vh for browsers that don’t support dvh */
-        .full-viewport-height {
-            height: 100vh;
-        }
-
-        /* Use 100dvh when supported for full dynamic viewport height */
-        @supports (height: 100dvh) {
-            .full-viewport-height {
-                height: 100dvh;
-            }
-        }
-
-        video {
-            width: 100vw;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
+        /* Video feed stays fixed and full-screen */
+        .video-feed {
+            position: fixed;
             top: 0;
             left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: 10;
             filter: invert(100%) grayscale(100%);
         }
 
+        /* Fallback message if camera access fails */
+        .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff3333;
+            font-family: 'Arial', sans-serif;
+            font-size: 1.5em;
+            text-align: center;
+            display: none; /* Hidden by default */
+        }
     </style>
 </head>
 <body>
-    <div id="video-container" class="full-viewport-height">
-        <video id="cameraStream" autoplay playsinline></video>
+    <!-- Fixed video feed -->
+    <video id="cameraStream" class="video-feed" autoplay playsinline></video>
+
+    <!-- Fallback error message for blocked camera -->
+    <div id="errorMessage" class="error-message">
+        ⚠️ Camera access is blocked.<br>Please enable camera permissions in your browser settings or use a different browser.
     </div>
 
     <script>
         const video = document.getElementById('cameraStream');
+        const errorMessage = document.getElementById('errorMessage');
 
-        // Start the back-facing camera with filters applied
+        // Start the back-facing camera with filters and error handling
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -63,17 +70,20 @@
                 video.srcObject = stream;
             } catch (err) {
                 console.error("Error accessing the camera: ", err);
+                // Show error message if camera is blocked or denied
+                showError();
             }
         }
 
-        // Start the camera stream when the page loads
+        // Show fallback message if camera access is blocked
+        function showError() {
+            errorMessage.style.display = 'block';
+            video.style.display = 'none'; // Hide the video feed
+        }
+
+        // Attempt to start the camera on page load
         startCamera();
 
-        // Ensure the video adjusts properly on resize
-        window.addEventListener('resize', () => {
-            video.style.width = '100vw';
-            video.style.height = '100%';
-        });
     </script>
 </body>
 </html>
