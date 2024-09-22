@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Fullscreen Camera Stream</title>
     <style>
         * {
@@ -60,6 +62,21 @@
             background-color: #ddd;
         }
 
+        /* Pseudo full-screen styles */
+        .fullscreen-like {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: black;
+            z-index: 9999;
+        }
+
+        .fullscreen-like video {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -74,6 +91,7 @@
         const video = document.getElementById('cameraStream');
         const fullscreenBtn = document.getElementById('fullscreenBtn');
         const container = document.getElementById('video-container');
+        let isFullscreen = false; // Track fullscreen state
 
         // Detect if the device is an iPhone or iPad
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -95,14 +113,22 @@
         // Start the camera stream when the page loads
         startCamera();
 
-        // Fullscreen toggle for iOS devices (opens a new tab for fullscreen)
+        // Fullscreen-like toggle for iOS devices (if fullscreen doesn't work natively)
         fullscreenBtn.addEventListener('click', () => {
             if (isIOS) {
-                // Open a new tab for iOS devices instead of using fullscreen
-                const fullscreenURL = window.location.href; // Current page URL
-                window.open(fullscreenURL, '_blank'); // Open the URL in a new tab
+                if (!isFullscreen) {
+                    // Simulate fullscreen-like mode using CSS
+                    container.classList.add('fullscreen-like');
+                    fullscreenBtn.innerText = "Exit Fullscreen";
+                    isFullscreen = true;
+                } else {
+                    // Exit pseudo fullscreen mode
+                    container.classList.remove('fullscreen-like');
+                    fullscreenBtn.innerText = "Enter Fullscreen";
+                    isFullscreen = false;
+                }
             } else {
-                // Use normal fullscreen for non-iOS devices
+                // For non-iOS devices, use native fullscreen API
                 if (!document.fullscreenElement) {
                     container.requestFullscreen();
                     fullscreenBtn.innerText = "Exit Fullscreen";
