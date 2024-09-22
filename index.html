@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Camera with Inverted Audio Phase</title>
+    <title>Camera with Amplified Inverted Audio</title>
     <style>
         * {
             margin: 0;
@@ -82,49 +82,51 @@
         const scrollInstruction = document.getElementById('scrollInstruction');
         const errorMessage = document.getElementById('errorMessage');
 
-        // Start the camera and microphone with permissions for both
+        // Kamera und Mikrofon starten mit kombinierten Berechtigungen
         async function startCameraAndMic() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: { exact: "environment" },  // Use back camera
-                        width: { ideal: 3840 },  // 4K resolution
-                        height: { ideal: 2160 }, // 4K resolution
-                        frameRate: { ideal: 60 }  // 60 fps for smoother video
+                        facingMode: { exact: "environment" },  // Rückkamera verwenden
+                        width: { ideal: 3840 },  // 4K-Auflösung
+                        height: { ideal: 2160 }, // 4K-Auflösung
+                        frameRate: { ideal: 60 }  // 60 FPS für flüssigeres Video
                     },
-                    audio: true  // Request microphone access for noise cancellation
+                    audio: true  // Mikrofonzugriff für das Noise Cancelling anfordern
                 });
 
-                // Set video stream
+                // Videostream festlegen
                 video.srcObject = stream;
 
-                // Setup audio context for phase inversion
+                // Audio-Kontext einrichten für die Phaseninversion
                 const audioContext = new AudioContext();
                 const audioSource = audioContext.createMediaStreamSource(stream);
                 const gainNode = audioContext.createGain();
-                gainNode.gain.value = -1;  // Invert audio phase
-
-                // Connect audio for noise cancellation
+                
+                // Verstärkung für invertierte Phase erhöhen
+                gainNode.gain.value = -10;  // Negative Verstärkung für invertierte Phase (Verstärken)
+                
+                // Audio verbinden für Noise Cancelling
                 audioSource.connect(gainNode);
                 gainNode.connect(audioContext.destination);
 
             } catch (err) {
-                console.error("Error accessing the camera or microphone: ", err);
+                console.error("Fehler beim Zugriff auf Kamera oder Mikrofon: ", err);
                 showError();
             }
         }
 
-        // Show fallback message if permissions are blocked
+        // Fehlermeldung anzeigen, wenn die Berechtigungen blockiert sind
         function showError() {
             errorMessage.style.display = 'block';
             video.style.display = 'none';
             scrollInstruction.style.display = 'none';
         }
 
-        // Start the camera and mic feed when the page loads
+        // Kamera- und Mikrofon-Feed starten, wenn die Seite geladen wird
         startCameraAndMic();
 
-        // Adjust the text instruction position based on the URL bar
+        // Textposition basierend auf der URL-Leiste anpassen
         function adjustTextPosition() {
             const viewportHeight = window.innerHeight;
             const fullHeight = window.innerHeight || document.documentElement.clientHeight;
@@ -137,11 +139,11 @@
             }
         }
 
-        // Reposition text on load and resize
+        // Textposition beim Laden und bei der Größenänderung anpassen
         adjustTextPosition();
         window.addEventListener('resize', adjustTextPosition);
 
-        // Move the text to the bottom of the screen on scroll
+        // Text zum unteren Rand verschieben, wenn gescrollt wird
         window.addEventListener('scroll', () => {
             if (window.scrollY > 0) {
                 scrollInstruction.style.bottom = '10px';
@@ -150,13 +152,13 @@
             }
         });
 
-        // Ensure the video feed fits the full screen
+        // Sicherstellen, dass der Videostream den gesamten Bildschirm ausfüllt
         function adjustVideoFit() {
             video.style.width = '100vw';
             video.style.height = '100vh';
         }
 
-        // Adjust video size on window resize or orientation change
+        // Videogröße bei Fensteränderung oder Änderung der Ausrichtung anpassen
         window.addEventListener('resize', adjustVideoFit);
     </script>
 </body>
