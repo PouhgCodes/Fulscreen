@@ -30,16 +30,16 @@
         video {
             width: 100vw;
             height: 100vh;
-            object-fit: cover; /* Ensure the video covers the screen */
+            object-fit: cover;
             position: absolute;
             top: 0;
             left: 0;
-            filter: invert(100%) grayscale(100%); /* Apply filters to video */
+            filter: invert(100%) grayscale(100%);
         }
 
         .controls {
             position: absolute;
-            bottom: 100px; /* Move the button higher to avoid URL bar or navigation bar */
+            bottom: 60px;
             width: 100%;
             display: flex;
             justify-content: center;
@@ -47,65 +47,56 @@
         }
 
         button {
-            padding: 12px 28px;
+            padding: 14px 28px;
             background-color: #fff;
             border: none;
             cursor: pointer;
             font-size: 18px;
             z-index: 10;
-            border-radius: 8px; /* Make button visible and easy to click */
+            border-radius: 8px;
         }
 
         button:hover {
             background-color: #ddd;
         }
 
-        /* iOS-specific video controls hiding */
-        video::-webkit-media-controls {
-            display: none !important; /* Hide iOS default controls */
-        }
-
-        video::-webkit-media-controls-play-button,
-        video::-webkit-media-controls-overlay-play-button {
-            display: none !important;
-        }
-
-        /* Hide iOS fullscreen media controls */
-        video::-webkit-media-controls-enclosure {
-            display: none !important;
-        }
-
-        /* Add a custom fullscreen effect */
-        .fullscreen-active {
+        /* iOS-specific fullscreen styles */
+        #video-container:-webkit-full-screen {
             width: 100vw;
             height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
             background-color: black;
         }
+
+        #video-container:-webkit-full-screen video {
+            width: 100%;
+            height: 100%;
+        }
+
+        video::-webkit-media-controls {
+            display: none !important;
+        }
+
     </style>
 </head>
 <body>
-    <div class="container" id="container">
+    <div id="video-container" class="container">
         <video id="cameraStream" autoplay playsinline></video>
         <div class="controls">
-            <button id="fullscreenBtn">Enter Fullscreen</button> <!-- Fullscreen button -->
+            <button id="fullscreenBtn">Enter Fullscreen</button>
         </div>
     </div>
 
     <script>
         const video = document.getElementById('cameraStream');
         const fullscreenBtn = document.getElementById('fullscreenBtn');
-        const container = document.getElementById('container');
+        const container = document.getElementById('video-container');
 
         // Start the back-facing camera with filters applied
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: { exact: "environment" } // Use back-facing camera
+                        facingMode: { exact: "environment" }
                     }
                 });
                 video.srcObject = stream;
@@ -114,29 +105,16 @@
             }
         }
 
-        // Force the URL bar to collapse on iPhones by quickly scrolling
-        function forceURLBarCollapse() {
-            window.scrollTo(0, 1); // Scroll to hide the URL bar
-        }
-
         // Start the camera stream when the page loads
         startCamera();
 
-        // Force URL bar to collapse after 100ms when the page loads
-        window.onload = () => {
-            setTimeout(forceURLBarCollapse, 100);
-        };
-
-        // Handle fullscreen toggle with iOS-specific fixes
+        // Fullscreen toggle for the container
         fullscreenBtn.addEventListener('click', () => {
-            // Apply CSS-based fullscreen mode for iPhones, avoiding default video controls
             if (!document.fullscreenElement) {
-                container.classList.add('fullscreen-active');
-                container.requestFullscreen();
+                container.webkitRequestFullscreen(); // Enter fullscreen for the container
                 fullscreenBtn.innerText = "Exit Fullscreen";
             } else {
-                document.exitFullscreen();
-                container.classList.remove('fullscreen-active');
+                document.webkitExitFullscreen(); // Exit fullscreen
                 fullscreenBtn.innerText = "Enter Fullscreen";
             }
         });
@@ -148,7 +126,7 @@
             video.style.objectFit = 'cover'; // Ensures the video covers the entire screen
         }
 
-        // Initial call to ensure the video is scaled correctly
+        // Adjust the video fit initially
         adjustVideoFit();
 
         // Re-adjust video size when the window is resized or orientation changes
