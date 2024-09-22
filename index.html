@@ -60,21 +60,6 @@
             background-color: #ddd;
         }
 
-        #video-container:-webkit-full-screen {
-            width: 100vw;
-            height: 100vh;
-            background-color: black;
-        }
-
-        #video-container:-webkit-full-screen video {
-            width: 100%;
-            height: 100%;
-        }
-
-        video::-webkit-media-controls {
-            display: none !important;
-        }
-
     </style>
 </head>
 <body>
@@ -89,6 +74,9 @@
         const video = document.getElementById('cameraStream');
         const fullscreenBtn = document.getElementById('fullscreenBtn');
         const container = document.getElementById('video-container');
+
+        // Detect if the device is an iPhone or iPad
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
         // Start the back-facing camera with filters applied
         async function startCamera() {
@@ -107,16 +95,21 @@
         // Start the camera stream when the page loads
         startCamera();
 
-        // Add a debug message to track if the button gets clicked
-        fullscreenBtn.addEventListener('touchstart', () => {
-            console.log('Fullscreen button clicked'); // This will confirm if the button is responding
-
-            if (!document.fullscreenElement) {
-                container.webkitRequestFullscreen(); // Trigger fullscreen for the container
-                fullscreenBtn.innerText = "Exit Fullscreen";
+        // Fullscreen toggle for iOS devices (opens a new tab for fullscreen)
+        fullscreenBtn.addEventListener('click', () => {
+            if (isIOS) {
+                // Open a new tab for iOS devices instead of using fullscreen
+                const fullscreenURL = window.location.href; // Current page URL
+                window.open(fullscreenURL, '_blank'); // Open the URL in a new tab
             } else {
-                document.webkitExitFullscreen(); // Exit fullscreen mode
-                fullscreenBtn.innerText = "Enter Fullscreen";
+                // Use normal fullscreen for non-iOS devices
+                if (!document.fullscreenElement) {
+                    container.requestFullscreen();
+                    fullscreenBtn.innerText = "Exit Fullscreen";
+                } else {
+                    document.exitFullscreen();
+                    fullscreenBtn.innerText = "Enter Fullscreen";
+                }
             }
         });
 
