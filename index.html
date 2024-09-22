@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Gallery Camera App</title>
     <style>
         * {
@@ -33,22 +33,20 @@
         video {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Ensures the video covers the entire screen */
+            object-fit: cover; /* Ensures video covers the screen */
             position: absolute;
             top: 0;
             left: 0;
             background: black;
-
-            /* Apply both filters */
-            filter: invert(100%) grayscale(100%);
+            filter: invert(100%) grayscale(100%); /* Apply both filters by default */
         }
 
         .controls {
             position: absolute;
             bottom: 20px;
+            width: 100%;
             display: flex;
             justify-content: center;
-            width: 100%;
         }
 
         button {
@@ -57,14 +55,22 @@
             border: none;
             cursor: pointer;
             font-size: 16px;
+            z-index: 10; /* Ensure button is always visible */
         }
 
         button:hover {
             background-color: #ddd;
         }
 
-        /* Hide default media controls in full screen */
         video::-webkit-media-controls {
+            display: none !important; /* Hide default media controls */
+        }
+
+        video::-webkit-media-controls-play-button {
+            display: none !important;
+        }
+
+        video::-webkit-media-controls-overlay-play-button {
             display: none !important;
         }
     </style>
@@ -81,11 +87,13 @@
         const video = document.getElementById('cameraStream');
         const fullscreenBtn = document.getElementById('fullscreenBtn');
 
-        // Start the camera stream using the back-facing camera
+        // Start the back-facing camera stream
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: { exact: "environment" } } // Use back-facing camera
+                    video: {
+                        facingMode: { exact: "environment" } // Force back-facing camera
+                    }
                 });
                 video.srcObject = stream;
             } catch (err) {
@@ -93,27 +101,34 @@
             }
         }
 
-        // Call the function to start the camera
+        // Start camera when the page loads
         startCamera();
 
-        // Fullscreen functionality with UI hiding
+        // Fullscreen functionality
         fullscreenBtn.addEventListener('click', () => {
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-            } else {
+            if (!document.fullscreenElement) {
                 document.body.requestFullscreen();
+            } else {
+                document.exitFullscreen();
             }
         });
 
-        // Handle screen resizing or orientation change to maintain full video coverage
+        // Keep video filling the screen in both default and fullscreen modes
         window.addEventListener('resize', () => {
+            adjustVideoFit();
+        });
+
+        function adjustVideoFit() {
             const aspectRatio = window.innerWidth / window.innerHeight;
             if (aspectRatio > 1) {
-                video.style.objectFit = 'cover'; // Landscape mode
+                video.style.objectFit = 'cover'; // For landscape mode
             } else {
-                video.style.objectFit = 'contain'; // Portrait mode, avoid cropping
+                video.style.objectFit = 'contain'; // For portrait mode, avoid cropping
             }
-        });
+        }
+
+        // Initial video fit
+        adjustVideoFit();
     </script>
 </body>
 </html>
