@@ -30,7 +30,7 @@
         video {
             width: 100vw;
             height: 100vh;
-            object-fit: cover; /* Ensures the video covers the screen without black bars */
+            object-fit: cover; /* Ensures video covers the entire screen */
             position: absolute;
             top: 0;
             left: 0;
@@ -39,7 +39,7 @@
 
         .controls {
             position: absolute;
-            bottom: 20px;
+            bottom: 30px; /* Ensure it's above the bottom bar on iPhones */
             width: 100%;
             display: flex;
             justify-content: center;
@@ -47,11 +47,11 @@
         }
 
         button {
-            padding: 10px 20px;
+            padding: 12px 25px;
             background-color: #fff;
             border: none;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             z-index: 10;
         }
 
@@ -68,7 +68,7 @@
     <div class="container">
         <video id="cameraStream" autoplay playsinline></video>
         <div class="controls">
-            <button id="fullscreenBtn">Full Screen</button>
+            <button id="fullscreenBtn">Enter Fullscreen</button> <!-- Button visible and clickable -->
         </div>
     </div>
 
@@ -93,20 +93,22 @@
         // Start camera on page load
         startCamera();
 
-        // Fullscreen functionality with UI hiding
+        // Fullscreen functionality
         fullscreenBtn.addEventListener('click', () => {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen(); // Enter fullscreen
+                document.documentElement.requestFullscreen(); // Enter fullscreen mode
+                fullscreenBtn.innerText = "Exit Fullscreen"; // Change button text when in fullscreen
             } else {
-                document.exitFullscreen(); // Exit fullscreen
+                document.exitFullscreen(); // Exit fullscreen mode
+                fullscreenBtn.innerText = "Enter Fullscreen"; // Change button text back
             }
         });
 
-        // Adjust video fit to ensure it fills the screen properly without black bars
+        // Ensure the camera stream covers the screen in both modes
         function adjustVideoFit() {
             video.style.width = '100vw';
             video.style.height = '100vh';
-            video.style.objectFit = 'cover'; // Ensures the video covers the entire screen
+            video.style.objectFit = 'cover'; // Ensure the video covers the entire screen
         }
 
         // Initial call to ensure the video is scaled correctly
