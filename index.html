@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width; initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Fake Fullscreen Camera Stream</title>
+    <title>Camera Stream with Dynamic Viewport Height</title>
     <style>
         * {
             margin: 0;
@@ -15,23 +15,26 @@
 
         body, html {
             width: 100%;
-            height: 200vh; /* Ensures there's enough height to trigger scroll */
+            height: 100%;
             overflow: hidden;
             background-color: #000;
         }
 
-        .container {
-            position: relative;
-            width: 100vw;
+        /* Fallback to 100vh for browsers that don’t support dvh */
+        .full-viewport-height {
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        }
+
+        /* Use 100dvh when supported for full dynamic viewport height */
+        @supports (height: 100dvh) {
+            .full-viewport-height {
+                height: 100dvh;
+            }
         }
 
         video {
             width: 100vw;
-            height: 100vh;
+            height: 100%;
             object-fit: cover;
             position: absolute;
             top: 0;
@@ -39,66 +42,22 @@
             filter: invert(100%) grayscale(100%);
         }
 
-        .controls {
-            position: absolute;
-            bottom: 60px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            z-index: 10;
-        }
-
-        button {
-            padding: 14px 28px;
-            background-color: #fff;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            z-index: 10;
-            border-radius: 8px;
-        }
-
-        button:hover {
-            background-color: #ddd;
-        }
-
-        /* Pseudo fullscreen */
-        .fullscreen-like {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: black;
-            z-index: 9999;
-        }
-
-        .fullscreen-like video {
-            width: 100%;
-            height: 100%;
-        }
     </style>
 </head>
 <body>
-    <div id="video-container" class="container">
+    <div id="video-container" class="full-viewport-height">
         <video id="cameraStream" autoplay playsinline></video>
-        <div class="controls">
-            <button id="fullscreenBtn">Enter Fullscreen</button>
-        </div>
     </div>
 
     <script>
         const video = document.getElementById('cameraStream');
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
-        const container = document.getElementById('video-container');
-        let isFullscreen = false;
 
         // Start the back-facing camera with filters applied
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: { exact: "environment" }
+                        facingMode: { exact: "environment" } // Use back camera
                     }
                 });
                 video.srcObject = stream;
@@ -110,52 +69,11 @@
         // Start the camera stream when the page loads
         startCamera();
 
-        // Force the browser to hide the URL bar by simulating a scroll
-        function collapseURLBar() {
-            window.scrollTo(0, 1); // Scroll by 1px to collapse the URL bar
-        }
-
-        // Trigger URL bar hiding on load
-        window.onload = function() {
-            setTimeout(collapseURLBar, 100); // Wait briefly before trying to scroll
-        };
-
-        // Enter "fullscreen" by hiding browser UI
-        function enterFakeFullscreen() {
-            collapseURLBar(); // Collapse the URL bar
-            container.classList.add('fullscreen-like'); // Simulate fullscreen using CSS
-            fullscreenBtn.innerText = "Exit Fullscreen";
-        }
-
-        // Exit "fullscreen" by showing browser UI again
-        function exitFakeFullscreen() {
-            container.classList.remove('fullscreen-like'); // Exit the CSS fullscreen mode
-            fullscreenBtn.innerText = "Enter Fullscreen";
-        }
-
-        // Toggle "fullscreen" mode
-        fullscreenBtn.addEventListener('click', () => {
-            if (!isFullscreen) {
-                enterFakeFullscreen();
-                isFullscreen = true;
-            } else {
-                exitFakeFullscreen();
-                isFullscreen = false;
-            }
-        });
-
-        // Ensure the video covers the screen properly without black bars
-        function adjustVideoFit() {
+        // Ensure the video adjusts properly on resize
+        window.addEventListener('resize', () => {
             video.style.width = '100vw';
-            video.style.height = '100vh';
-            video.style.objectFit = 'cover';
-        }
-
-        // Initial call to ensure the video is scaled correctly
-        adjustVideoFit();
-
-        // Re-adjust video size when the window is resized or orientation changes
-        window.addEventListener('resize', adjustVideoFit);
+            video.style.height = '100%';
+        });
     </script>
 </body>
 </html>
